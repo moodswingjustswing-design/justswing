@@ -277,7 +277,7 @@ const FULL_SIZES = ["S","M","L","XL","2XL"];       // used by the newest tees: s
     {name:"Moodswings Patch Beanie",                   cat:"Beanies",  price:"", img:"beanie",        sizes:["OS"],     stock:{Black:[12], Brown:[12]}},
     {name:"Defend Pop Punk Tee (Black shirt)",         cat:"T-shirts", price:"", img:"defend",        sizes:FULL_SIZES, stock:{"White print":[0,1,0,0,0], "Orange print":[0,1,0,1,0], "Pink print":[0,1,0,1,0]}},
     {name:"Moodswings Oval Patch Cap",                 cat:"Caps",     price:"", img:"cap",           sizes:["OS"],     stock:{Black:[10], Orange:[10], Red:[10]}},
-    {name:"Serving Hardcore Punk Tee",                cat:"T-shirts", price:"", img:"serving_punk",  sizes:FULL_SIZES, stock:{Black:[5,8,8,6,4], White:[5,8,8,6,4]}},
+    {name:"Serving Hardcore Punk Tee",                cat:"T-shirts", price:"", img:"serving_punk",  sizes:FULL_SIZES, stock:{Black:[0,0,0,0,0], White:[0,0,0,0,0]}},
     {name:"Bulbwire Tee",                             cat:"T-shirts", price:"", img:"still_noise",   sizes:FULL_SIZES, stock:{Black:[0,0,0,0,1]}}
   ];
   products.forEach(p => { p.price = p.price || PRICES[p.cat] || ""; });   // product price wins, else category price
