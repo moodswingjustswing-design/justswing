@@ -309,9 +309,19 @@ const FULL_SIZES = ["S","M","L","XL","2XL"];       // used by the newest tees: s
   const baseOf = (p, c, s) => p.stock[c][sizesOf(p).indexOf(s)] || 0;   // the number you typed in the list
   // Orders placed in THIS browser are subtracted from your number. If you edit a number in the list,
   // the old subtraction for that size is dropped automatically (so you never double-count).
+  // RESTOCK_RESET: change this number (1 -> 2 -> 3...) whenever you restock and want every saved sale cleared,
+  // even if the number you type is the same as before (for example 1 -> 0 -> 1).
+  const RESTOCK_RESET = 1;
   const SOLD_KEY = "moodswings-sold-v1";
   let sold = {};
   try{ sold = JSON.parse(localStorage.getItem(SOLD_KEY) || "{}"); }catch(_){ sold = {}; }
+  try{
+    if(localStorage.getItem(SOLD_KEY + "-reset") !== String(RESTOCK_RESET)){
+      sold = {};
+      localStorage.setItem(SOLD_KEY, "{}");
+      localStorage.setItem(SOLD_KEY + "-reset", String(RESTOCK_RESET));
+    }
+  }catch(_){}
   const skey = (p, c, s) => `${p.name}|${c}|${s}`;
   const left = (p, c, s) => {
     const b = baseOf(p, c, s), r = sold[skey(p, c, s)];
@@ -323,6 +333,15 @@ const FULL_SIZES = ["S","M","L","XL","2XL"];       // used by the newest tees: s
     r.n += qty; sold[k] = r;
     try{ localStorage.setItem(SOLD_KEY, JSON.stringify(sold)); }catch(_){}
   }
+  // Drop old sale records whose number no longer matches the list (e.g. you changed 1 to 0), so typing 1 again works.
+  (function pruneSold(){
+    let changed = false;
+    products.forEach(p => colorsOf(p).forEach(c => sizesOf(p).forEach(s => {
+      const k = skey(p, c, s), r = sold[k];
+      if(r && r.base !== baseOf(p, c, s)){ delete sold[k]; changed = true; }
+    })));
+    if(changed){ try{ localStorage.setItem(SOLD_KEY, JSON.stringify(sold)); }catch(_){} }
+  })();
   const hasStock = (p, c) => sizesOf(p).some(s => left(p, c, s) > 0);
 
   // remembers each card's choice, so it survives switching category filters
