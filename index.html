@@ -55,6 +55,7 @@
   .item .colors{font-size:.85rem;color:#444;margin-top:.1rem}
   .item h3{font-family:var(--tall);font-size:1.4rem;text-transform:uppercase;margin-top:.6rem;letter-spacing:.02em}
   .item .meta{display:flex;justify-content:space-between;align-items:center;margin-top:.3rem}
+  .item .price .ship{font-size:.7rem;font-weight:500;letter-spacing:0;opacity:.7;white-space:nowrap}
   .item .price{font-family:system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:1.1rem;font-weight:700;letter-spacing:.02em;color:var(--black)}
   .item .order{margin-left:auto;font:inherit;font-weight:700;background:var(--black);color:var(--paper);padding:.45rem .8rem;text-decoration:none}
   .item .order:hover{background:var(--paper);color:var(--black);outline:2px solid var(--black)}
@@ -256,29 +257,42 @@ const FULL_SIZES = ["S","M","L","XL","2XL"];       // used by the newest tees: s
   // Want one product to cost something different? Put price:"₱650" on that product in the list below
   // and it will be used instead of the category price. Use price:"" and no category price to hide it.
 
+  // ===== SHIPPING FEE: change the numbers here =====
+  // One flat shipping fee per ORDER, per collection (category). Set a category to 0 for free shipping.
+  const SHIPPING = {
+    "T-shirts": 100,
+    "Beanies":  100,
+    "Caps":     100
+  };
+  const num   = s => parseInt(String(s || "").replace(/[^\d]/g, ""), 10) || 0;      // "₱750" -> 750
+  const peso  = n => "\u20B1" + n.toLocaleString("en-US");                           // 850 -> "₱850"
+  const shipOf  = p => SHIPPING[p.cat] || 0;
+  const totalOf = (p, qty) => num(p.price) * qty + shipOf(p);
+
   const LOW = 3;                                     // shows "Only N left" at or below this number
 
   const products = [
-    // img = key in the image list at the bottom of the file.  price: leave "" to use the category price from PRICES above, or type a price (e.g. "₱650") just for this product.
+    // price = THIS product's own price. Change the number inside the quotes for each item (e.g. "₱650"). Leave "" to fall back to the category price in PRICES above.
+    // img = key in the image list at the bottom of the file.
     // stock = pieces left, per color, in the order of the sizes: [Small, Medium, Large] (newer tees: [S, M, L, XL, 2XL]).  0 = sold out.  EDIT THESE NUMBERS to match your real stock.
     // sizes = optional size list for that product.  imgs = optional photo per color (the photo changes when the color is picked).
-    {name:"Hardcore: It Wasn't Really My Fault Tee", cat:"T-shirts", price:"", img:"hardcore",      sizes:FULL_SIZES, stock:{Black:[0,0,1,0,0]}},
-    {name:"Pop Punk Sucks Tee",                        cat:"T-shirts", price:"", img:"poppunk",       sizes:FULL_SIZES, stock:{Black:[0,1,0,1,1], White:[0,0,0,1,0], Blue:[0,2,1,0,0]}},
-    {name:"Don't Be a Hero Tee",                       cat:"T-shirts", price:"", img:"hero_black",    imgs:{Black:"hero_black", White:"hero_white"}, sizes:FULL_SIZES, stock:{Black:[0,2,2,3,1], White:[0,2,2,2,2]}},
-    {name:"They'll Love You Forever Tee",              cat:"T-shirts", price:"", img:"forever_black", imgs:{Black:"forever_black", White:"forever_white"}, sizes:FULL_SIZES, stock:{Black:[0,2,2,1,2], White:[0,2,2,2,2]}},
-    {name:"Sheep Not Goat Tee",                        cat:"T-shirts", price:"", img:"sheep",         imgs:{Black:"sheep", White:"sheep_white"}, sizes:FULL_SIZES, stock:{Black:[0,0,0,2,0], White:[0,1,0,0,0]}},
-    {name:"State of Mind XXX Tee",                     cat:"T-shirts", price:"", img:"xxx",           imgs:{Black:"xxx", Maroon:"xxx_maroon"}, sizes:FULL_SIZES, stock:{Black:[0,1,0,1,0], Maroon:[0,1,0,0,0]}},
+    {name:"Hardcore: It Wasn't Really My Fault Tee", cat:"T-shirts", price:"₱750", img:"hardcore",      sizes:FULL_SIZES, stock:{Black:[0,0,1,0,0]}},
+    {name:"Pop Punk Sucks Tee",                        cat:"T-shirts", price:"₱750", img:"poppunk",       sizes:FULL_SIZES, stock:{Black:[0,1,0,1,1], White:[0,0,0,1,2], Blue:[0,2,1,0,0]}},
+    {name:"Don't Be a Hero Tee",                       cat:"T-shirts", price:"₱800", img:"hero_black",    imgs:{Black:"hero_black", White:"hero_white"}, sizes:FULL_SIZES, stock:{Black:[0,2,2,3,1], White:[0,2,2,2,2]}},
+    {name:"They'll Love You Forever Tee",              cat:"T-shirts", price:"₱800", img:"forever_black", imgs:{Black:"forever_black", White:"forever_white"}, sizes:FULL_SIZES, stock:{Black:[0,2,2,1,2], White:[0,2,2,2,2]}},
+    {name:"Sheep Not Goat Tee",                        cat:"T-shirts", price:"₱750", img:"sheep",         imgs:{Black:"sheep", White:"sheep_white"}, sizes:FULL_SIZES, stock:{Black:[0,0,0,2,0], White:[0,1,0,0,0]}},
+    {name:"State of Mind XXX Tee",                     cat:"T-shirts", price:"₱750", img:"xxx",           imgs:{Black:"xxx", Maroon:"xxx_maroon"}, sizes:FULL_SIZES, stock:{Black:[0,1,0,0,0], Maroon:[0,1,0,0,0]}},
 
     // ---- new ----
-    {name:"We're All Gonna Die Tee",                   cat:"T-shirts", price:"", img:"gonnadie_black", imgs:{Black:"gonnadie_black", White:"gonnadie_white"}, sizes:FULL_SIZES, stock:{Black:[5,8,8,6,4], White:[5,8,8,6,4]}},
-    {name:"Hardcore Dept. Bulldog Tee (Color)",        cat:"T-shirts", price:"", img:"bulldog_color_black", imgs:{Black:"bulldog_color_black", White:"bulldog_color_white"}, sizes:FULL_SIZES, stock:{Black:[0,3,2,4,2], White:[0,3,2,2,1]}},
-    {name:"Hardcore Dept. Bulldog Tee (Mono)",         cat:"T-shirts", price:"", img:"bulldog_mono_black",  imgs:{Black:"bulldog_mono_black",  White:"bulldog_mono_white"},  sizes:FULL_SIZES, stock:{Black:[0,0,0,0,0], White:[0,0,0,0,0]}},
-    {name:"Moodswings Death Club Tee",                 cat:"T-shirts", price:"", img:"deathclub",     sizes:FULL_SIZES, stock:{Black:[0,0,0,1,1]}},
-    {name:"Moodswings Patch Beanie",                   cat:"Beanies",  price:"", img:"beanie",        sizes:["OS"],     stock:{Black:[12], Brown:[12]}},
-    {name:"Defend Pop Punk Tee (Black shirt)",         cat:"T-shirts", price:"", img:"defend",        sizes:FULL_SIZES, stock:{"White print":[0,1,0,0,0], "Orange print":[0,1,0,1,0], "Pink print":[0,1,0,1,0]}},
-    {name:"Moodswings Oval Patch Cap",                 cat:"Caps",     price:"", img:"cap",           sizes:["OS"],     stock:{Black:[0], Orange:[0], Red:[0]}},
-    {name:"Serving Hardcore Punk Tee",                cat:"T-shirts", price:"", img:"serving_punk",  sizes:FULL_SIZES, stock:{Black:[0,0,0,0,0], White:[0,0,0,0,0]}},
-    {name:"Bulbwire Tee",                             cat:"T-shirts", price:"", img:"still_noise",   sizes:FULL_SIZES, stock:{Black:[0,0,0,0,1]}}
+    {name:"We're All Gonna Die Tee",                   cat:"T-shirts", price:"₱750", img:"gonnadie_black", imgs:{Black:"gonnadie_black", White:"gonnadie_white"}, sizes:FULL_SIZES, stock:{Black:[0,0,0,0,0], White:[0,0,0,0,0]}},
+    {name:"Hardcore Dept. Bulldog Tee (Color)",        cat:"T-shirts", price:"₱800", img:"bulldog_color_black", imgs:{Black:"bulldog_color_black", White:"bulldog_color_white"}, sizes:FULL_SIZES, stock:{Black:[0,3,2,4,2], White:[0,3,2,2,1]}},
+    {name:"Hardcore Dept. Bulldog Tee (Mono)",         cat:"T-shirts", price:"₱750", img:"bulldog_mono_black",  imgs:{Black:"bulldog_mono_black",  White:"bulldog_mono_white"},  sizes:FULL_SIZES, stock:{Black:[5,8,8,6,4], White:[5,8,8,6,4]}},
+    {name:"Moodswings Death Club Tee",                 cat:"T-shirts", price:"₱750", img:"deathclub",     sizes:FULL_SIZES, stock:{Black:[0,0,0,1,1]}},
+    {name:"Moodswings Patch Beanie",                   cat:"Beanies", price:"₱320", img:"beanie",        sizes:["OS"],     stock:{Black:[12], Brown:[12]}},
+    {name:"Defend Pop Punk Tee (Black shirt)",         cat:"T-shirts", price:"₱750", img:"defend",        sizes:FULL_SIZES, stock:{"White print":[0,1,0,0,0], "Orange print":[0,1,0,1,0], "Pink print":[0,1,0,1,0]}},
+    {name:"Moodswings Oval Patch Cap",                 cat:"Caps", price:"₱400", img:"cap",           sizes:["OS"],     stock:{Black:[0], Orange:[0], Red:[0]}},
+    {name:"Serving Hardcore Punk Tee",                cat:"T-shirts", price:"₱750", img:"serving_punk",  sizes:FULL_SIZES, stock:{Black:[0,0,0,0,0], White:[0,0,0,0,0]}},
+    {name:"Bulbwire Tee",                             cat:"T-shirts", price:"₱750", img:"still_noise",   sizes:FULL_SIZES, stock:{Black:[0,0,0,0,1]}}
   ];
   products.forEach(p => { p.price = p.price || PRICES[p.cat] || ""; });   // product price wins, else category price
   const cats = ["All", ...new Set(products.map(p => p.cat))];
@@ -332,6 +346,8 @@ const FULL_SIZES = ["S","M","L","XL","2XL"];       // used by the newest tees: s
       `Size: ${SIZE_NAMES[s]}`,
       `Quantity: ${qty}`,
       ...(p.price ? [`Price each: ${p.price}`] : []),
+      ...(shipOf(p) ? [`Shipping fee: ${peso(shipOf(p))}`] : []),
+      ...(p.price ? [`Total to pay: ${peso(totalOf(p, qty))}`] : []),
       "", "CUSTOMER",
       `Name: ${name}`,
       `Address: ${addr}`,
@@ -395,7 +411,7 @@ const FULL_SIZES = ["S","M","L","XL","2XL"];       // used by the newest tees: s
         <h3>${p.name}</h3>
         <div class="opts"></div>
         <p class="stock" aria-live="polite"></p>
-        <div class="meta">${p.price ? `<span class="price">${p.price}</span>` : ""}<button type="button" class="order"></button></div>
+        <div class="meta">${p.price ? `<span class="price">${p.price}${shipOf(p) ? ` <small class="ship">+ ${peso(shipOf(p))} shipping</small>` : ""}</span>` : ""}<button type="button" class="order"></button></div>
       </article>`).join("");
     $("grid").querySelectorAll(".item").forEach(refresh);
   }
@@ -430,7 +446,7 @@ const FULL_SIZES = ["S","M","L","XL","2XL"];       // used by the newest tees: s
     cur = {i, c: st.color, s: st.size};
     const n = left(p, cur.c, cur.s);
     $("odItem").textContent = p.name;
-    $("odOpts").textContent = `${cur.c}, ${SIZE_NAMES[cur.s]}` + (p.price ? `, ${p.price}` : "");
+    $("odOpts").textContent = `${cur.c}, ${SIZE_NAMES[cur.s]}` + (p.price ? `, ${p.price}` : "") + (shipOf(p) ? ` + ${peso(shipOf(p))} shipping` : "");
     $("odQty").max = n; $("odQty").value = 1;
     $("odMax").textContent = `(up to ${n})`;
     $("odMsg").hidden = true;
@@ -472,7 +488,8 @@ const FULL_SIZES = ["S","M","L","XL","2XL"];       // used by the newest tees: s
       qrBox.innerHTML = '<div class="noqr">Add your GCash QR picture in the shop settings (GCASH_QR).</div>';
     }
     $("odGName").textContent = GCASH_NAME ? "Account name: " + GCASH_NAME : "";
-    $("odPayAmt").textContent = `${p.name} (${cur.c}, ${SIZE_NAMES[cur.s]}) x${qty}` + (p.price ? ` - ${p.price} each` : "");
+    $("odPayAmt").textContent = `${p.name} (${cur.c}, ${SIZE_NAMES[cur.s]}) x${qty}` + (p.price ? ` - ${p.price} each` : "")
+      + (shipOf(p) ? ` + ${peso(shipOf(p))} shipping` : "") + (p.price ? ` = TOTAL ${peso(totalOf(p, qty))}` : "");
     $("odPayTo").textContent = EMAIL;
     const subj = `Payment screenshot: ${p.name} (${cur.c}, ${SIZE_NAMES[cur.s]}) x${qty} - ${name}`;
     const body = "I have paid through GCash. My payment screenshot is below (pasted or attached).\r\n\r\n" + orderText(p, cur.c, cur.s, qty, name, addr) + "\r\n\r\n(Paste or attach the screenshot here)";
