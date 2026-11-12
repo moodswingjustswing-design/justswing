@@ -386,7 +386,7 @@ const FULL_SIZES = ["S","M","L","XL","2XL"];       // used by the newest tees: s
   products.forEach(p => { p.price = p.price || PRICES[p.cat] || ""; });   // product price wins, else category price
   // ===== ADMIN DATA (prices + products added from the admin panel) =====
   // To make admin changes show for ALL customers: in the admin panel press "Copy site data", then replace the {} on the next line with what you copied.
-  const PUBLISHED = {};
+  const PUBLISHED = "https://mood-swing-b7932-default-rtdb.asia-southeast1.firebasedatabase.app/";
   const DRAFT_KEY = "moodswings-admin-draft-v1";
   const adminData = {prices:{}, shipping:{}, stock:{}, stockRev:0, added:[], removed:[]};
   const BUILTIN_PRODUCTS = products.slice();   // original list, so removed items can be restored
